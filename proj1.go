@@ -1,15 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"os"
-	"strconv"
-	"strings"
-)
-
-package main
-
-import (
 	"bufio"
 	"fmt"
 	"os"
@@ -18,96 +9,98 @@ import (
 )
 
 func main() {
-	reader := bufio.NewReader(os.Stdin)
 	for {
-		fmt.Println("Введите значение")
-		text, _ := reader.ReadString('\n') // Ждет ввода данных в формате строки
-		text = strings.TrimSpace(text)     // Очищает все пустоты (пробелы, табуляцию)
-		toNumber, _ := strconv.Atoi(text) // Преобразование строки в число
-		fmt.Println(toNumber + 8)        // Вывод результата
+		RawInputData := readInput()
+		fmt.Println("\n Полученное выражение:" + RawInputData)
+		parsedData := parseData(RawInputData)
+		fmt.Println("\n Полученные данные:\n первый аргумент: " + parsedData[0] + "\n операция: " + parsedData[1] + "\n второй аргумент: " + parsedData[2])
+		if checkFirstArg(parsedData[0]) {
+			fmt.Println("\n проверка пройдена, вычисляем...")
+			calculatedValue := calculate(parsedData[0])
+			fmt.Println("\n Вычисленное значение:" + calculatedValue)
+		}
+
+		fmt.Println("\n Программа закончила выполнение")
 	}
 }
 
+func readInput() string {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Println("\n Введите выражение в виде \n\"<строка1>\" <операция> \"<строка2>\" \n или \n\"<строка>\" <операция> <число>\n ")
+	text, _ := reader.ReadString('\n') // Ждет ввода данных в формате строки
+	return text
+}
 
-func main() {
-	if len(os.Args) < 2 {
-		panic("Необходимо передать строку с выражением.")
+func parseData(input string) []string {
+	// Разделяем строку по пробелам
+	parts := strings.Fields(input)
+	if len(parts) == 3 {
+
+		return parts
+	} else {
+		fmt.Println("\n Количество аргументов не соответствует ожидаемому")
+		ArgErrorPanic()
+	}
+	return nil
+}
+
+func ArgErrorPanic() {
+	panic("Недопустимая операция")
+}
+
+func checkFirstArg(input string) bool {
+	// Проверка на наличие кавычек
+	if len(input) < 2 || input[0] != '"' || input[len(input)-1] != '"' {
+		return false
 	}
 
-	input := os.Args[1]
-	result := calculate(input)
-	fmt.Println(result)
+	// Убираем кавычки для проверки длины
+	trimmedInput := input[1 : len(input)-1]
+
+	// Проверка длины строки без кавычек
+	if len(trimmedInput) > 10 {
+		return false
+	}
+
+	return true
+}
+
+func checkOperation(op string) bool {
+	// Проверяем, что операция является одной из поддерживаемых
+	switch op {
+	case "+", "-", "*", "/":
+		return true
+	default:
+		return false
+	}
+}
+
+func checkSecondArg(input string) bool {
+	// Проверка на наличие кавычек
+	if len(input) < 2 || input[0] != '"' || input[len(input)-1] != '"' {
+		// Если нет кавычек, проверяем, является ли это числом
+		num, err := strconv.Atoi(input)
+		if err != nil {
+			return false // Не число
+		}
+		// Проверка диапазона для чисел
+		if num < 1 || num > 10 {
+			return false // Число вне диапазона
+		}
+		return true // Число в диапазоне
+	}
+
+	// Убираем кавычки для проверки длины
+	trimmedInput := input[1 : len(input)-1]
+
+	// Проверка длины строки без кавычек
+	if len(trimmedInput) > 10 {
+		return false
+	}
+
+	return true
 }
 
 func calculate(expression string) string {
-	// Удаляем пробелы и разбиваем строку на компоненты
-	expression = strings.ReplaceAll(expression, " ", "")
-	if !strings.Contains(expression, "+") && !strings.Contains(expression, "-") && !strings.Contains(expression, "*") && !strings.Contains(expression, "/") {
-		panic("Недопустимая операция. Поддерживаемые операции: +, -, *, /.")
-	}
-
-	var str1, str2 string
-	var operator string
-
-	// Определяем оператор и разбиваем строку
-	if strings.Contains(expression, "+") {
-		parts := strings.Split(expression, "+")
-		operator = "+"
-		str1, str2 = parts[0], parts[1]
-	} else if strings.Contains(expression, "-") {
-		parts := strings.Split(expression, "-")
-		operator = "-"
-		str1, str2 = parts[0], parts[1]
-	} else if strings.Contains(expression, "*") {
-		parts := strings.Split(expression, "*")
-		operator = "*"
-		str1, str2 = parts[0], parts[1]
-	} else if strings.Contains(expression, "/") {
-		parts := strings.Split(expression, "/")
-		operator = "/"
-		str1, str2 = parts[0], parts[1]
-	}
-
-	// Удаляем кавычки
-	str1 = strings.Trim(str1, "\"")
-	str2 = strings.Trim(str2, "\"")
-
-	// Проверяем, является ли str2 числом
-	if operator == "*" || operator == "/" {
-		num, err := strconv.Atoi(str2)
-		if err != nil || num < 1 || num > 10 {
-			panic("Недопустимое число. Должно быть от 1 до 10.")
-		}
-		return performStringOperation(str1, str2, operator, num)
-	}
-
-	// Операции сложения и вычитания
-	if operator == "+" {
-		return "\"" + str1 + str2 + "\""
-	} else if operator == "-" {
-		return "\"" + performSubtraction(str1, str2) + "\""
-	}
-
-	panic("Недопустимая операция.")
-}
-
-func performStringOperation(str string, strNum string, operator string, num int) string {
-	if operator == "*" {
-		return "\"" + strings.Repeat(str, num) + "\""
-	} else if operator == "/" {
-		if num > len(str) {
-			return "\"\""
-		}
-		return "\"" + str[:len(str)/num] + "\""
-	}
-	return ""
-}
-
-func performSubtraction(str1 string, str2 string) string {
-	// Удаляем str2 из str1
-	result := strings.ReplaceAll(str1, str2, "")
-	if result == "" {
-		return str1
-	}
-	return result
+	return "1"
 }
