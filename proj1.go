@@ -104,3 +104,11 @@ func checkSecondArg(input string) bool {
 func calculate(expression string) string {
 	return "1"
 }
+
+func calcAdd() {
+
+}
+
+func calcSub() {
+
+}
