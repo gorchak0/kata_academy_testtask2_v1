@@ -14,10 +14,13 @@ func main() {
 		fmt.Println("\n Полученное выражение:" + RawInputData)
 		parsedData := parseData(RawInputData)
 		fmt.Println("\n Полученные данные:\n первый аргумент: " + parsedData[0] + "\n операция: " + parsedData[1] + "\n второй аргумент: " + parsedData[2])
-		if checkFirstArg(parsedData[0]) {
+		if checkFirstArg(parsedData[0]) && checkOperation(parsedData[1]) && checkSecondArg(parsedData[2]) {
 			fmt.Println("\n проверка пройдена, вычисляем...")
-			calculatedValue := calculate(parsedData[0])
+			calculatedValue := calculate(parsedData)
 			fmt.Println("\n Вычисленное значение:" + calculatedValue)
+		} else {
+			fmt.Println("\n При проверке аргументов произошла ошибка")
+			ArgErrorPanic()
 		}
 
 		fmt.Println("\n Программа закончила выполнение")
@@ -105,10 +108,35 @@ func calculate(expression string) string {
 	return "1"
 }
 
-func calcAdd() {
-
+// Функция для сложения строк
+func calcAdd(str1, str2 string) string {
+	return str1 + str2 // Объединяем две строки
 }
 
-func calcSub() {
+// Функция для вычитания строк
+func calcSub(str1, str2 string) string {
+	if strings.Contains(str1, str2) {
+		return strings.Replace(str1, str2, "", 1) // Удаляем вторую строку из первой
+	}
+	return str1 // Если второй строки нет в первой, возвращаем первую строку
+}
 
+// Функция для умножения строк
+func calcMult(str string, count int) string {
+	if count <= 0 {
+		return "" // Если количество 0 или меньше, возвращаем пустую строку
+	}
+	return strings.Repeat(str, count) // Повторяем первую строку указанное количество раз
+}
+
+// Функция для деления строк
+func calcDiv(str string, count int) string {
+	if count <= 0 {
+		return "" // Если делитель 0 или меньше, возвращаем пустую строку
+	}
+	newLength := len(str) / count // Уменьшаем длину первой строки на указанный раз
+	if newLength < 0 {
+		return "" // Если результат меньше 0, возвращаем пустую строку
+	}
+	return str[:newLength] // Возвращаем строку до новой длины
 }
