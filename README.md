@@ -24,6 +24,39 @@
 арифметических операций, приложение выдаёт панику и завершает свою работу.
 
 ___
+Пример работы программы:
+``` go
+Input:
+"100" + "500"
+
+Output:
+"100500"
+
+Input:
+"Hi World!" - "World!"
+
+Output:
+"Hi "
+
+Input:
+"Bye-bye!" - "World!"
+
+Output:
+"Bye-bye!"
+
+Input:
+"Golang" * 5
+
+Output:
+"GolangGolangGolangGolangGolang"
+
+Input:
+"Example!!!" / 3
+
+Output:
+"Exa"
+```
+___
 
 **Алгоритм работы строкового калькулятора:**
 
